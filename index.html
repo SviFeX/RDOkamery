@@ -465,6 +465,12 @@
   106, 105, 104, 186, 182,
   156, 155, 154, 196, 192
 ];
+const standardDeviceOrder = [
+  103, 102, 101, 181, 183, 188, 187,
+  153, 152, 151, 191, 193, 198, 197,
+  106, 105, 104, 186, 182, 185, 184,
+  156, 155, 154, 196, 192, 194
+];
 
     const cameraGrid = document.getElementById("cameraGrid");
     const modeToggleButton = document.getElementById("modeToggleButton");
@@ -480,14 +486,20 @@
     }
 
     function getVisibleCameras() {
-      if (currentViewMode === "overview") {
-        return overviewDeviceOrder
-          .map(getCameraByDeviceNumber)
-          .filter(Boolean);
-      }
+  if (currentViewMode === "overview") {
+    return overviewDeviceOrder
+      .map(getCameraByDeviceNumber)
+      .filter(Boolean);
+  }
 
-      return cameras;
-    }
+  if (currentViewMode === "standard") {
+    return standardDeviceOrder
+      .map(getCameraByDeviceNumber)
+      .filter(Boolean);
+  }
+
+  return cameras;
+}
 
     function updateTileSizes() {
       const gap = 1;
