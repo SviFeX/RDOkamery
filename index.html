@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="icon" href="ico/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="ico/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="ico/favicon-32x32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="ico/apple-touch-icon.png">
 
   <title>Podgląd kamer</title>
+
+  <link rel="icon" href="ico/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="ico/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="ico/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="ico/apple-touch-icon.png">
 
   <style>
     :root {
       --overview-tile-width: 300px;
+      --standard-tile-width: 220px;
     }
 
     * {
@@ -21,27 +23,27 @@
 
     body {
       margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-    }
-
-    body.overview-mode {
+      width: 100vw;
       height: 100vh;
       overflow: hidden;
+
+      display: flex;
+      flex-direction: column;
+
+      font-family: Arial, sans-serif;
+      color: #fff;
+
+      background-color: #111;
+      background-image:
+        linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+        url("images/background.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
     }
 
     header {
-      padding: 16px 20px;
-      text-align: center;
-      background: #1c1c1c;
-      border-bottom: 1px solid #333;
-    }
-
-    body.overview-mode header {
       display: none;
     }
 
@@ -50,98 +52,97 @@
       font-size: 26px;
     }
 
-    .toolbar {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding: 8px;
-      background: #181818;
-      border-bottom: 1px solid #333;
-    }
+    .mode-toggle {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      z-index: 5000;
 
-    .view-button {
-      border: 1px solid #444;
-      background: #222;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(20, 20, 20, 0.72);
       color: #fff;
-      padding: 7px 14px;
-      border-radius: 8px;
+
+      padding: 9px 13px;
+      border-radius: 999px;
+
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
+
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      opacity: 0.68;
+      transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
     }
 
-    .view-button:hover {
-      background: #333;
-    }
-
-    .view-button.is-active {
-      background: #fff;
-      color: #111;
-      border-color: #fff;
+    .mode-toggle:hover {
+      opacity: 1;
+      transform: scale(1.04);
+      background: rgba(35, 35, 35, 0.9);
     }
 
     .camera-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      padding: 16px;
-      max-width: 1600px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    .camera-grid.is-overview {
       flex: 1;
       width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 6px;
-      gap: 6px;
-      overflow: hidden;
+      height: 100%;
 
-      grid-template-columns: repeat(5, var(--overview-tile-width));
-      grid-template-rows: repeat(4, auto);
+      display: grid;
+      margin: 0;
+      padding: 1px;
+      gap: 1px;
+      overflow: hidden;
 
       justify-content: center;
       align-content: center;
     }
 
+    .camera-grid.is-overview {
+      grid-template-columns: repeat(5, var(--overview-tile-width));
+      grid-template-rows: repeat(4, auto);
+    }
+
+    .camera-grid.is-standard {
+      grid-template-columns: repeat(7, var(--standard-tile-width));
+      grid-template-rows: repeat(4, auto);
+    }
+
     .camera-tile {
-      background: #1b1b1b;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 10px;
+      background: transparent;
+      border: none;
+      border-radius: 2px;
+      padding: 0;
       cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.12s ease;
     }
 
     .camera-tile:hover {
-      transform: scale(1.01);
-      border-color: #666;
+      transform: scale(1.005);
     }
 
     .camera-grid.is-overview .camera-tile {
       width: var(--overview-tile-width);
       min-width: 0;
-      padding: 4px;
-      border-radius: 6px;
-      background: #080808;
-      border-color: #222;
+      padding: 0;
+      border-radius: 2px;
+      background: transparent;
+    }
+
+    .camera-grid.is-standard .camera-tile {
+      width: var(--standard-tile-width);
+      min-width: 0;
+      padding: 0;
+      border-radius: 2px;
+      background: transparent;
     }
 
     .camera-view {
+      position: relative;
       width: 100%;
       aspect-ratio: 4 / 3;
-      background: #000;
-      border-radius: 8px;
+      background: transparent;
+      border-radius: 2px;
       overflow: hidden;
-      border: 1px solid #444;
-    }
-
-    .camera-grid.is-overview .camera-view {
-      aspect-ratio: 4 / 3;
-      border-radius: 4px;
-      border-color: #222;
+      border: none;
     }
 
     .camera-view img {
@@ -149,28 +150,30 @@
       height: 100%;
       object-fit: cover;
       display: block;
-    }
-
-    .camera-grid.is-overview .camera-view img {
-      object-fit: cover;
+      background: transparent;
     }
 
     .camera-caption {
-      margin-top: 8px;
-      text-align: center;
-      font-size: 15px;
-      font-weight: bold;
-      color: #eaeaea;
-    }
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
 
-    .camera-grid.is-overview .camera-caption {
-      margin-top: 3px;
-      font-size: 12px;
-      line-height: 1.1;
-      color: #ddd;
+      padding: 2px 5px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: bold;
+      line-height: 1.15;
+
+      color: #fff;
+      background: rgba(0, 0, 0, 0.38);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      pointer-events: none;
     }
 
     .camera-modal {
@@ -178,32 +181,46 @@
       inset: 0;
       z-index: 9999;
       display: none;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.92);
+      padding: 10px;
       cursor: pointer;
+
+      background-color: #111;
+      background-image:
+        linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+        url("images/background.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
     .camera-modal.is-open {
       display: flex;
       align-items: center;
       justify-content: center;
+      animation: modalFadeIn 0.14s ease-out;
     }
 
     .camera-modal-content {
-      width: calc(100vw - 32px);
-      height: calc(100vh - 32px);
-      background: #000;
-      border-radius: 10px;
+      position: relative;
+
+      width: min(calc(100vw - 20px), calc((100vh - 20px) * 4 / 3));
+      aspect-ratio: 4 / 3;
+
+      background: transparent;
+      border-radius: 4px;
       overflow: hidden;
-      border: 1px solid #333;
-      display: flex;
-      flex-direction: column;
+      border: none;
+
+      animation: modalZoomIn 0.16s ease-out;
+      transform-origin: center center;
     }
 
     .camera-modal-image-wrapper {
-      flex: 1;
-      min-height: 0;
-      background: #000;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+
       display: flex;
       align-items: center;
       justify-content: center;
@@ -214,68 +231,92 @@
       height: 100%;
       object-fit: contain;
       display: block;
+      background: transparent;
     }
 
     .camera-modal-caption {
-      padding: 10px 16px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+
+      width: 100%;
+
+      padding: 8px 14px;
       font-size: 20px;
       font-weight: bold;
       text-align: center;
-      background: #111;
-      border-top: 1px solid #333;
+
+      background: rgba(0, 0, 0, 0.42);
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 1);
+      pointer-events: none;
     }
 
-    @media (max-width: 1000px) {
-      .camera-grid:not(.is-overview) {
-        grid-template-columns: repeat(2, 1fr);
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes modalZoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.94);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
       }
     }
 
     @media (max-width: 650px) {
-      .camera-grid:not(.is-overview) {
-        grid-template-columns: 1fr;
-      }
-
       .camera-modal {
-        padding: 8px;
+        padding: 6px;
       }
 
       .camera-modal-content {
-        width: calc(100vw - 16px);
-        height: calc(100vh - 16px);
+        width: min(calc(100vw - 12px), calc((100vh - 12px) * 4 / 3));
       }
 
       .camera-modal-caption {
         font-size: 16px;
       }
+
+      .mode-toggle {
+        right: 8px;
+        bottom: 8px;
+        padding: 8px 11px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
 
-<body class="overview-mode">
+<body>
   <header>
     <h1>Podgląd kamer</h1>
   </header>
 
-  <div class="toolbar" id="toolbar">
-    <button class="view-button is-active" id="overviewViewButton" type="button">
-      WIDOK KOMPAKTOWY
-    </button>
-
-    <button class="view-button" id="standardViewButton" type="button">
-      WSZYSTKIE KAMERY
-    </button>
-  </div>
-
   <main class="camera-grid is-overview" id="cameraGrid"></main>
+
+  <button class="mode-toggle" id="modeToggleButton" type="button">
+    Widok standardowy
+  </button>
 
   <div class="camera-modal" id="cameraModal">
     <div class="camera-modal-content">
+      <div class="camera-modal-caption" id="cameraModalCaption"></div>
+
       <div class="camera-modal-image-wrapper">
         <img id="cameraModalImage" src="" alt="" />
       </div>
-
-      <div class="camera-modal-caption" id="cameraModalCaption"></div>
     </div>
   </div>
 
@@ -419,17 +460,14 @@
     ];
 
     const overviewDeviceOrder = [
-      101, 102, 103, 181, 191,
-      151, 152, 153, 183, 193,
-      104, 105, 106, 186, 196,
-      154, 155, 156, 182, 192
-    ];
+  103, 102, 101, 181, 183,
+  153, 152, 151, 191, 193,
+  106, 105, 104, 186, 182,
+  156, 155, 154, 196, 192
+];
 
     const cameraGrid = document.getElementById("cameraGrid");
-    const toolbar = document.getElementById("toolbar");
-
-    const overviewViewButton = document.getElementById("overviewViewButton");
-    const standardViewButton = document.getElementById("standardViewButton");
+    const modeToggleButton = document.getElementById("modeToggleButton");
 
     const cameraModal = document.getElementById("cameraModal");
     const cameraModalImage = document.getElementById("cameraModalImage");
@@ -451,40 +489,62 @@
       return cameras;
     }
 
-    function updateOverviewTileSize() {
-      if (currentViewMode !== "overview") {
-        return;
+    function updateTileSizes() {
+      const gap = 1;
+      const gridPadding = 2;
+
+      if (currentViewMode === "overview") {
+        const columns = 5;
+        const rows = 4;
+
+        const availableWidth =
+          window.innerWidth - gridPadding - gap * (columns - 1);
+
+        const availableHeight =
+          window.innerHeight - gridPadding - gap * (rows - 1);
+
+        const tileWidthByWidth = availableWidth / columns;
+        const tileWidthByHeight = (availableHeight / rows) * 4 / 3;
+
+        const tileWidth = Math.floor(
+          Math.max(120, Math.min(tileWidthByWidth, tileWidthByHeight))
+        );
+
+        document.documentElement.style.setProperty(
+          "--overview-tile-width",
+          `${tileWidth}px`
+        );
       }
 
-      const columns = 5;
-      const rows = 4;
+      if (currentViewMode === "standard") {
+        const columns = 7;
+        const rows = 4;
 
-      const gridPadding = 12;
-      const gap = 6;
-      const tileExtraHeight = 28;
+        const availableWidth =
+          window.innerWidth - gridPadding - gap * (columns - 1);
 
-      const toolbarHeight = toolbar.offsetHeight;
+        const availableHeight =
+          window.innerHeight - gridPadding - gap * (rows - 1);
 
-      const availableWidth =
-        window.innerWidth - gridPadding - gap * (columns - 1);
+        const tileWidthByWidth = availableWidth / columns;
+        const tileWidthByHeight = (availableHeight / rows) * 4 / 3;
 
-      const availableHeight =
-        window.innerHeight - toolbarHeight - gridPadding - gap * (rows - 1);
+        const tileWidth = Math.floor(
+          Math.max(90, Math.min(tileWidthByWidth, tileWidthByHeight))
+        );
 
-      const tileWidthByWidth = availableWidth / columns;
+        document.documentElement.style.setProperty(
+          "--standard-tile-width",
+          `${tileWidth}px`
+        );
+      }
+    }
 
-      const tileHeightByHeight = availableHeight / rows;
-      const imageHeightByHeight = tileHeightByHeight - tileExtraHeight;
-      const tileWidthByHeight = imageHeightByHeight * 4 / 3;
-
-      const tileWidth = Math.floor(
-        Math.max(120, Math.min(tileWidthByWidth, tileWidthByHeight))
-      );
-
-      document.documentElement.style.setProperty(
-        "--overview-tile-width",
-        `${tileWidth}px`
-      );
+    function updateToggleButtonText() {
+      modeToggleButton.textContent =
+        currentViewMode === "overview"
+          ? "POKAŻ INNE"
+          : "UKRYJ INNE";
     }
 
     function openCameraModal(camera) {
@@ -492,7 +552,6 @@
       cameraModalImage.alt = camera.name;
       cameraModalCaption.textContent = camera.name;
       cameraModal.classList.add("is-open");
-      document.body.style.overflow = "hidden";
     }
 
     function closeCameraModal() {
@@ -500,29 +559,24 @@
       cameraModalImage.src = "";
       cameraModalImage.alt = "";
       cameraModalCaption.textContent = "";
-
-      if (currentViewMode === "overview") {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "";
-      }
     }
 
     function setViewMode(viewMode) {
       currentViewMode = viewMode;
 
       const isOverview = currentViewMode === "overview";
+      const isStandard = currentViewMode === "standard";
 
-      document.body.classList.toggle("overview-mode", isOverview);
       cameraGrid.classList.toggle("is-overview", isOverview);
-
-      overviewViewButton.classList.toggle("is-active", isOverview);
-      standardViewButton.classList.toggle("is-active", !isOverview);
-
-      document.body.style.overflow = isOverview ? "hidden" : "";
+      cameraGrid.classList.toggle("is-standard", isStandard);
 
       renderCameras();
-      updateOverviewTileSize();
+      updateTileSizes();
+      updateToggleButtonText();
+    }
+
+    function toggleViewMode() {
+      setViewMode(currentViewMode === "overview" ? "standard" : "overview");
     }
 
     function renderCameras() {
@@ -551,19 +605,13 @@
         });
 
         view.appendChild(image);
+        view.appendChild(caption);
         tile.appendChild(view);
-        tile.appendChild(caption);
         cameraGrid.appendChild(tile);
       });
     }
 
-    overviewViewButton.addEventListener("click", () => {
-      setViewMode("overview");
-    });
-
-    standardViewButton.addEventListener("click", () => {
-      setViewMode("standard");
-    });
+    modeToggleButton.addEventListener("click", toggleViewMode);
 
     cameraModal.addEventListener("click", () => {
       closeCameraModal();
@@ -576,11 +624,12 @@
     });
 
     window.addEventListener("resize", () => {
-      updateOverviewTileSize();
+      updateTileSizes();
     });
 
     renderCameras();
-    updateOverviewTileSize();
+    updateTileSizes();
+    updateToggleButtonText();
   </script>
 </body>
 </html>
